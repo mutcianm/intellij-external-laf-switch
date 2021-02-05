@@ -1,10 +1,10 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.16'
+    id 'org.jetbrains.intellij' version '0.6.5'
 }
 
 group 'com.github.mutcianm'
-version '1.3'
+version '2021.1'
 
 repositories {
     mavenCentral()
@@ -15,9 +15,14 @@ dependencies {
 }
 
 intellij {
+    version 'LATEST-EAP-SNAPSHOT'
     patchPluginXml {
-        sinceBuild "203.0"
+        sinceBuild "211.0"
     }
+}
+
+publishPlugin {
+    token = System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken")
 }
 
 buildSearchableOptions.enabled = false
