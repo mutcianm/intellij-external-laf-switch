@@ -1,10 +1,13 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.6.5'
+    id 'org.jetbrains.intellij' version '0.7.2'
 }
 
+def ideBaseVersion = "2020.3"
+def ideFullVersion = "${ideBaseVersion}.3"
+
 group 'com.github.mutcianm'
-version '2021.1'
+version "${ideBaseVersion}.1"
 
 repositories {
     mavenCentral()
@@ -15,10 +18,11 @@ dependencies {
 }
 
 intellij {
-    version 'LATEST-EAP-SNAPSHOT'
-    patchPluginXml {
-        sinceBuild "211.0"
-    }
+    version ideFullVersion
+}
+
+runPluginVerifier {
+    ideVersions = ["IC-$ideFullVersion"]
 }
 
 publishPlugin {
