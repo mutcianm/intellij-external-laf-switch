@@ -24,6 +24,7 @@ the configuration panel in the settings under <p>'File | Settings | Appearance &
 
     <applicationListeners>
         <listener class="com.github.mutcianm.lafswitch.LafChangeListener" topic="com.intellij.ide.AppLifecycleListener"/>
+        <listener class="com.github.mutcianm.lafswitch.PluginUnloadListener" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     </applicationListeners>
 
 </idea-plugin>
