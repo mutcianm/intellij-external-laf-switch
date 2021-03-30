@@ -1,19 +1,26 @@
 <idea-plugin>
     <id>com.github.mutcianm.external-laf-switch</id>
-    <name>External LAF switch</name>
+    <name>External LAF Switch</name>
     <vendor email="mutcianko.m@gmail.com">Mikhail Mutcianko</vendor>
 
     <description><![CDATA[
-This plugin allows changing IDEA look and feel externally from a script or any other application on the local machine.</br>
-Currently only allows to switch between "Darcula" and "IntelliJ" themes via shortcuts "dark" or "light".</br>
-Other LaFs must be referred by their full name.</br>
-To apply change write "dark" / "light" or full LaF name into `tcp://localhost:16666`.</br>
-Port can be changed via `autolafswitch.port` registry variable.</br>
+<p>This plugin allows changing look and feel externally from a script or any other application on the local machine.</p>
+<p>To apply change write "dark" / "light" or full LaF name into `tcp://localhost:16666`.</p>
+LAFs corresponding to the "dark" and "light" modes as well as the interface and port to listen on can be set from
+the configuration panel in the settings under <p>'File | Settings | Appearance &amp; Behavior | External LAF Switcher'</p>
     ]]></description>
 
-    <idea-version since-build="2019.3"/>
+    <change-notes>
+        Added UI configuration under "File | Settings | Appearance &amp; Behavior | External LAF Switcher"
+    </change-notes>
+
+<!--    <idea-version since-build="2019.3"/>-->
 
     <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable instance="com.github.mutcianm.lafswitch.settings.LafSwitchConfigurable" parentId="appearance"/>
+    </extensions>
 
     <applicationListeners>
         <listener class="com.github.mutcianm.lafswitch.LafChangeListener" topic="com.intellij.ide.AppLifecycleListener"/>
