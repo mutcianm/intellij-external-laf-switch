@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.intellij' version '0.7.2'
 }
 
-def ideBaseVersion = "2021.1"
+def ideBaseVersion = "2021.2"
 def ideFullVersion = "${ideBaseVersion}.3"
 
 group 'com.github.mutcianm'
@@ -18,10 +18,10 @@ dependencies {
 }
 
 intellij {
-//    version ideFullVersion
+    version "212.5080.55"
     patchPluginXml {
         sinceBuild "211.0"
-        untilBuild "211.*"
+        untilBuild "213.*"
     }
 }
 
