@@ -46,26 +46,54 @@ public final class LafSwitchService implements PersistentStateComponent<LafSwitc
     }
 
     public UIManager.LookAndFeelInfo getDarkLAF() {
-        return findLafByName(myState.darkName);
+        return findLafByNameOrKind(myState.darkName, LAF_KIND.DARK);
     }
 
     public UIManager.LookAndFeelInfo getLightLAF() {
-        return findLafByName(myState.lightName);
+        return findLafByNameOrKind(myState.lightName, LAF_KIND.LIGHT);
     }
 
-    @NotNull
+    private UIManager.LookAndFeelInfo findLafByNameOrKind(String name, LAF_KIND kind) throws LafNotFoundException {
+        UIManager.LookAndFeelInfo lafByNameStrict = findLafByName(name);
+        if (lafByNameStrict != null) {
+            return lafByNameStrict;
+        } else {
+            UIManager.LookAndFeelInfo lafByNameLike = findLafByNameLike(kind.name());
+            if (lafByNameLike != null) {
+                LOG.info("Can't find LAF '" + name + "'. Found " + kind + " substitute: '" + lafByNameLike.getName() +"'");
+                switch (kind) {
+                    case DARK:
+                        myState.darkName    = lafByNameLike.getName();
+                        break;
+                    case LIGHT:
+                        myState.lightName   = lafByNameLike.getName();
+                        break;
+                }
+                return lafByNameLike;
+            } else {
+                throw new LafNotFoundException(name, kind);
+            }
+        }
+    }
+
+    @Nullable
     private UIManager.LookAndFeelInfo findLafByName(String name) {
-        UIManager.LookAndFeelInfo info = Arrays
+        return Arrays
                 .stream(LafManagerImpl.getInstance().getInstalledLookAndFeels())
                 .filter(laf -> Objects.equals(laf.getName(), name))
                 .findFirst().orElse(null);
-        if (info == null)
-            throw new RuntimeException("Can't find LAF" + name);
-        return info;
+    }
+
+    @Nullable
+    private UIManager.LookAndFeelInfo findLafByNameLike(String nameLike) {
+        return Arrays
+                .stream(LafManagerImpl.getInstance().getInstalledLookAndFeels())
+                .filter(laf -> laf.getName().toLowerCase().contains(nameLike.toLowerCase()))
+                .findFirst().orElse(null);
     }
 
     public static LafSwitchService getInstance() {
-        return ServiceManager.getService(LafSwitchService.class);
+        return ApplicationManager.getApplication().getService(LafSwitchService.class);
     }
 
     @Override
