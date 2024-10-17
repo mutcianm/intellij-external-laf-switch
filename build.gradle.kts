@@ -1,64 +1,44 @@
-fun properties(key: String) = project.findProperty(key).toString()
+fun platform(fullVersion: Any) = fullVersion.toString().drop(2).replace(".", "")
 
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.16.1"
+    id("org.jetbrains.intellij.platform") version "2.1.0"
 }
 
-group = properties("pluginGroup")
-version = properties("pluginVersion")
+val pluginVersion = "2024.3"
+val branchVersion = platform(pluginVersion)
+
+group = "com.github.mutcianm"
+version = pluginVersion
 
 // Configure project's dependencies
 repositories {
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+        snapshots()
+        nightly()
+    }
 }
 
-// Configure Gradle IntelliJ Plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-intellij {
-    pluginName.set(properties("pluginName"))
-    version.set(properties("platformVersion"))
-    type.set(properties("platformType"))
+dependencies {
+    intellijPlatform {
+        intellijIdeaCommunity("$branchVersion-EAP-SNAPSHOT", useInstaller = false)
+    }
 }
 
-tasks {
-    // Set the JVM compatibility versions
-    properties("javaVersion").let {
-        withType<JavaCompile> {
-            sourceCompatibility = it
-            targetCompatibility = it
-        }
-    }
+intellijPlatform.instrumentCode.set(false)
 
-    patchPluginXml {
-        version.set(properties("pluginVersion"))
-        sinceBuild.set(properties("pluginSinceBuild"))
-        untilBuild.set(properties("pluginUntilBuild"))
-    }
+tasks.patchPluginXml {
+    pluginName.set("External LAF Switch")
+    sinceBuild.set("$branchVersion.0")
+    untilBuild.set("$branchVersion.*")
+}
 
-    // Configure UI tests plugin
-    // Read more: https://github.com/JetBrains/intellij-ui-test-robot
-    runIdeForUiTests {
-        systemProperty("robot-server.port", "8082")
-        systemProperty("ide.mac.message.dialogs.as.sheets", "false")
-        systemProperty("jb.privacy.policy.text", "<!--999.999-->")
-        systemProperty("jb.consents.confirmation.enabled", "false")
-    }
+tasks.publishPlugin {
+    token.set(System.getenv("PUBLISH_TOKEN"))
+}
 
-    signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-    }
-
-    publishPlugin {
-        token.set(System.getenv("PUBLISH_TOKEN"))
-        // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
-        // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
-        // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
-    }
-
-    buildSearchableOptions {
-        enabled = false
-    }
+tasks.buildSearchableOptions {
+    enabled = false
 }
